@@ -1,13 +1,15 @@
 var _ = require('lodash');
 var colors = require('colors');
-var sh = require('execSync');
+var fs = require('fs');
 var humanSize = require('human-size');
 var minimatch = require('minimatch');
-var request = require('superagent');
 var program = require('commander');
+var request = require('superagent');
+var sh = require('execSync');
 var q = require('q');
-var settings = require('./settings.json'); // FIXME: This needs to be replaced with an INI file or something
 var table = require('easy-table');
+
+var settingsPath = '/home/mc/.ruget.json';
 
 program
 	.version(require('./package.json').version)
@@ -19,6 +21,29 @@ program
 	.option('-t, --tag [tags...]', 'Filter by tag', function(item, value) { value.push(item); return value; }, []) // Coherce into array of tags to filter by
 	.option('-s, --sort [fields...]', 'Sort by field', function(item, value) { value.push(item); return value; }, [])
 	.parse(process.argv);
+
+// Sanity checks {{{
+try {
+	var data = fs.readFileSync(settingsPath);
+	var settings = JSON.parse(data);
+} catch (e) {
+	console.log('No', settingsPath.cyan, 'settings file found');
+	process.exit(1);
+}
+
+if (!settings.url) {
+	console.log('No', 'url'.cyan, 'specified in the settings file');
+	process.exit(1);
+}
+if (!settings.commands || !settings.commands.download) {
+	console.log('No', 'commands.download'.cyan, 'download binary specified in the settings file');
+	process.exit(1);
+}
+if (!settings.commands || !settings.commands.downloadFast) {
+	console.log('No', 'commands.downloadFast'.cyan, 'download binary specified in the settings file');
+	process.exit(1);
+}
+// }}}
 
 // Populate defaults {{{
 if (program.sort.length == 0)
