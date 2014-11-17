@@ -49,11 +49,11 @@ function fetchList(options) {
 		)
 		.end(function(res) {
 			var items = _(res.body.t)
-				.values()
-				.filter(function(item) {
+				.values() // Convert from object -> collection
+				.filter(function(item) { // Scrap invalid items
 					return _.isArray(item) && item.length > 15;
 				})
-				.map(function(item) {
+				.map(function(item) { // Rewrite array into a logical structure
 					return {
 						name: item[4],
 						size: item[5],
@@ -64,7 +64,7 @@ function fetchList(options) {
 					}
 				});
 
-			if (options.args && options.args.length > 0) {
+			if (options.args && options.args.length > 0) { // Filter by filename by glob?
 				items = items.filter(function(item) {
 					return _.some(options.args, function(arg) {
 						return minimatch(item.name, arg);
@@ -72,7 +72,7 @@ function fetchList(options) {
 				});
 			}
 
-			if (options.tag && options.tag.length > 0) {
+			if (options.tag && options.tag.length > 0) { // Filter by an array of tags
 				var tagSearch = options.tag.map(function(item) { // Remove case from all tags and strip non ASCCI characters
 					return item.toLowerCase().replace(/[^a-z0-9]+/, '');
 				});
@@ -81,10 +81,10 @@ function fetchList(options) {
 				});
 			}
 
-			if (options.sort && options.sort.length > 0)
+			if (options.sort && options.sort.length > 0) // Apply sorting
 				items = items.sortBy(options.sort);
 
-			items = items.valueOf();
+			items = items.valueOf(); // Convert into JS array and return
 			if (items.length > 0) {
 				defer.resolve(items);
 			} else {
