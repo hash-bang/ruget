@@ -1,6 +1,7 @@
 var _ = require('lodash');
 var colors = require('colors');
 var humanSize = require('human-size');
+var minimatch = require('minimatch');
 var request = require('superagent');
 var program = require('commander');
 var q = require('q');
@@ -63,6 +64,14 @@ function fetchList(options) {
 					}
 				});
 
+			if (options.args && options.args.length > 0) {
+				items = items.filter(function(item) {
+					return _.some(options.args, function(arg) {
+						return minimatch(item.name, arg);
+					});
+				});
+			}
+
 			if (options.tag && options.tag.length > 0) {
 				var tagSearch = options.tag.map(function(item) { // Remove case from all tags and strip non ASCCI characters
 					return item.toLowerCase().replace(/[^a-z0-9]+/, '');
@@ -76,7 +85,6 @@ function fetchList(options) {
 				items = items.sortBy(options.sort);
 
 			items = items.valueOf();
-			console.log('REMAINING', items.length);
 			if (items.length > 0) {
 				defer.resolve(items);
 			} else {
@@ -85,7 +93,6 @@ function fetchList(options) {
 		});
 	return defer.promise;
 }
-
 
 if (program.list) {
  // List mode {{{
