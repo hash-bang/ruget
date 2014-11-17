@@ -1,15 +1,23 @@
 var _ = require('lodash');
+var humanSize = require('human-size');
 var request = require('superagent');
 var program = require('commander');
 var q = require('q');
 var settings = require('./settings.json'); // FIXME: This needs to be replaced with an INI file or something
+var table = require('easy-table');
 
 program
 	.version(require('./package.json').version)
 	.usage('[-l] [-t tags...]')
-	.option('-l, --list', 'List all files on server (use -t to filter)')
-	.option('-t, --tag [tags]', 'Filter by tag', function(item, value) { value.push(item); return value; }, []) // Coherce into array of tags to filter by
+	.option('-l, --list', 'List all files on server (use -t to filter, -s to sort)')
+	.option('-t, --tag [tags...]', 'Filter by tag', function(item, value) { value.push(item); return value; }, []) // Coherce into array of tags to filter by
+	.option('-s, --sort [fields...]', 'Sort by field', function(item, value) { value.push(item); return value; }, [])
 	.parse(process.argv);
+
+// Populate defaults {{{
+if (program.sort.length == 0)
+	program.sort = ['name'];
+// }}}
 
 
 /**
@@ -46,11 +54,12 @@ function fetchList(options) {
 					return {
 						name: item[4],
 						size: item[5],
+						complete: 100, // FIXME: This is wrong
 						tag: item[14],
 					}
 				});
 
-			if (options.tag) {
+			if (options.tag && options.tag.length > 0) {
 				var tagSearch = options.tag.map(function(item) { // Remove case from all tags and strip non ASCCI characters
 					return item.toLowerCase().replace(/[^a-z0-9]+/, '');
 				});
@@ -59,7 +68,11 @@ function fetchList(options) {
 				});
 			}
 
-			if (items) {
+			if (options.sort && options.sort.length > 0)
+				items = items.sortBy(options.sort);
+
+			items = items.valueOf();
+			if (items.length > 0) {
 				defer.resolve(items);
 			} else {
 				defer.reject();
@@ -73,9 +86,14 @@ if (program.list) {
  // List mode {{{
 	fetchList(program)
 		.then(function(items) {
+			var t = new table;
 			items.forEach(function(item) {
-				console.log(item);
+				t.cell('Name', item.name);
+				t.cell('%', item.complete);
+				t.cell('Size', humanSize(item.size));
+				t.newRow();
 			});
+			console.log(t.toString());
 		})
 		.fail(function() {
 			console.log('No matching items found');
