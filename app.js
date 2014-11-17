@@ -9,8 +9,6 @@ var sh = require('execSync');
 var q = require('q');
 var table = require('easy-table');
 
-var settingsPath = '/home/mc/.ruget.json';
-
 program
 	.version(require('./package.json').version)
 	.usage('[-l] [-t tags...]')
@@ -22,7 +20,12 @@ program
 	.option('-s, --sort [fields...]', 'Sort by field', function(item, value) { value.push(item); return value; }, [])
 	.parse(process.argv);
 
+// Settings {{{
 // Sanity checks {{{
+if (!process.env || !process.env.HOME) {
+	console.log('Environment variable HOME not found');
+}
+var settingsPath = process.env.HOME + '/.ruget.json';
 try {
 	var data = fs.readFileSync(settingsPath);
 	var settings = JSON.parse(data);
@@ -44,12 +47,11 @@ if (!settings.commands || !settings.commands.downloadFast) {
 	process.exit(1);
 }
 // }}}
-
 // Populate defaults {{{
 if (program.sort.length == 0)
 	program.sort = settings.sortOrder || ['name'];
 // }}}
-
+// }}}
 
 /**
 * Query the server for a list of active items
