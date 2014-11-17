@@ -94,7 +94,9 @@ function fetchList(options) {
 			if (options.args && options.args.length > 0) { // Filter by filename by glob?
 				items = items.filter(function(item) {
 					return _.some(options.args, function(arg) {
-						return minimatch(item.name, arg);
+						return minimatch(item.name, arg, {
+							nocase: true,
+						});
 					});
 				});
 			}
