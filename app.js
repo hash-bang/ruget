@@ -1,5 +1,6 @@
 var _ = require('lodash');
 var colors = require('colors');
+var sh = require('execSync');
 var humanSize = require('human-size');
 var minimatch = require('minimatch');
 var request = require('superagent');
@@ -14,6 +15,7 @@ program
 	.option('-d, --dryrun', 'Dont actually run any commands, just output what would have run')
 	.option('-l, --list', 'List all files on server (use -t to filter, -s to sort)')
 	.option('-f, --fast', 'Try to download files as quickly as possible')
+	.option('-v, --verbose', 'Be verbose')
 	.option('-t, --tag [tags...]', 'Filter by tag', function(item, value) { value.push(item); return value; }, []) // Coherce into array of tags to filter by
 	.option('-s, --sort [fields...]', 'Sort by field', function(item, value) { value.push(item); return value; }, [])
 	.parse(process.argv);
@@ -118,10 +120,20 @@ if (program.list) {
 				console.log('Downloading'.bold, item.name.blue, ('[' + (index+1) + '/' + items.length + ']').cyan);
 				var command = program.fast ? settings.commands.downloadFast : settings.commands.download;
 				command = command.replace('<path>', item.path.replace("'", "\\'"));
-				if (program.dryrun) {
+				if (program.dryrun || program.verbose) {
 					console.log('EXEC'.bold.red, command);
 				}
+				if (!program.dryrun) {
+					var code = sh.run(command);
+					if (code != 0) {
+						console.log('Downloader exited with code'.bold.red, code.toString().cyan);
+						process.exit(1);
+					}
+				}
 			});
+		})
+		.catch(function(e) {
+			console.log('Caught', e);
 		})
 		.fail(function() {
 			console.log('No matching items to download');
