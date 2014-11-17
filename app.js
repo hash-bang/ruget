@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var _ = require('lodash');
 var colors = require('colors');
 var fs = require('fs');
