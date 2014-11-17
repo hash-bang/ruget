@@ -6,14 +6,24 @@ Command line tool to interact with a remote [ruTorrent](http://forums.rutorrent.
 Installation
 ------------
 
+Grab from NPM:
+
+	sudo npm install -g ruget
+
+OR
+
 	git clone https://github.com/hash-bang/ruget.git
 	npm install
+	sudo ln -s $PWD/ruget /usr/bin/ruget
 
-Copy the [.ruget.json](docs/ruget.json.sample) file into your home directory.
+Then copy the [.ruget.json](docs/ruget.json.sample) file into your home directory.
 
 
 Example uses
 ============
+
+	# Get help
+	ruget --help
 
 	# List all files on server
 	ruget -l

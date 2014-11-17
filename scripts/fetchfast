@@ -1,0 +1,14 @@
+#!/usr/bin/expect -f
+# Usage: fetch <password> <file>
+# Download a matching set of files from an rTorrent server.
+# Rsync password assistant for crappy ruTorrent servers that don't accept RSA keys
+
+set password [lindex $argv 0]
+set path [lindex $argv 1]
+set timeout -1
+spawn rsync -Pavuc --append "${path}" .
+match_max 100000
+expect "*?assword:*"
+send -- "$password\r"
+send -- "\r"
+expect eof
