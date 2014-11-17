@@ -16,7 +16,7 @@ program
 
 // Populate defaults {{{
 if (program.sort.length == 0)
-	program.sort = ['name'];
+	program.sort = settings.sortOrder || ['name'];
 // }}}
 
 
@@ -56,6 +56,7 @@ function fetchList(options) {
 						size: item[5],
 						complete: 100, // FIXME: This is wrong
 						tag: item[14],
+						added: new Date(item[21] * 1000),
 					}
 				});
 
