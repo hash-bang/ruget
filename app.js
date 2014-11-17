@@ -148,7 +148,9 @@ if (program.list) {
 			items.forEach(function(item, index) {
 				console.log('Downloading'.bold, item.name.blue, ('[' + (index+1) + '/' + items.length + ']').cyan);
 				var command = program.fast ? settings.commands.downloadFast : settings.commands.download;
-				command = command.replace('<path>', item.path.replace("'", "\\'"));
+				command = command
+					.replace('<path>', item.path.replace("'", "\\'"))
+					.replace('<dir>', __dirname);
 				if (program.dryrun || program.verbose) {
 					console.log('EXEC'.bold.red, command);
 				}
