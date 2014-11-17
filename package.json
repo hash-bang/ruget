@@ -16,6 +16,8 @@
     "commander": "~2.5.0",
     "lodash": "~2.4.1",
     "easy-table": "~0.3.0",
-    "human-size": "~1.1.0"
+    "human-size": "~1.1.0",
+    "colors": "~1.0.3",
+    "passthru": "~0.3.0"
   }
 }

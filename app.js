@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var colors = require('colors');
 var humanSize = require('human-size');
 var request = require('superagent');
 var program = require('commander');
@@ -9,7 +10,9 @@ var table = require('easy-table');
 program
 	.version(require('./package.json').version)
 	.usage('[-l] [-t tags...]')
+	.option('-d, --dryrun', 'Dont actually run any commands, just output what would have run')
 	.option('-l, --list', 'List all files on server (use -t to filter, -s to sort)')
+	.option('-f, --fast', 'Try to download files as quickly as possible')
 	.option('-t, --tag [tags...]', 'Filter by tag', function(item, value) { value.push(item); return value; }, []) // Coherce into array of tags to filter by
 	.option('-s, --sort [fields...]', 'Sort by field', function(item, value) { value.push(item); return value; }, [])
 	.parse(process.argv);
@@ -50,13 +53,13 @@ function fetchList(options) {
 					return _.isArray(item) && item.length > 15;
 				})
 				.map(function(item) {
-					// console.log(item);
 					return {
 						name: item[4],
 						size: item[5],
 						complete: 100, // FIXME: This is wrong
 						tag: item[14],
 						added: new Date(item[21] * 1000),
+						path: item[25],
 					}
 				});
 
@@ -73,6 +76,7 @@ function fetchList(options) {
 				items = items.sortBy(options.sort);
 
 			items = items.valueOf();
+			console.log('REMAINING', items.length);
 			if (items.length > 0) {
 				defer.resolve(items);
 			} else {
@@ -100,4 +104,19 @@ if (program.list) {
 			console.log('No matching items found');
 		});
 // }}}
+} else { // Grab mode
+	fetchList(program)
+		.then(function(items) {
+			items.forEach(function(item, index) {
+				console.log('Downloading'.bold, item.name.blue, ('[' + (index+1) + '/' + items.length + ']').cyan);
+				var command = program.fast ? settings.commands.downloadFast : settings.commands.download;
+				command = command.replace('<path>', item.path.replace("'", "\\'"));
+				if (program.dryrun) {
+					console.log('EXEC'.bold.red, command);
+				}
+			});
+		})
+		.fail(function() {
+			console.log('No matching items to download');
+		});
 }
