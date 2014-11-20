@@ -34,7 +34,7 @@ try {
 	var data = fs.readFileSync(settingsPath);
 	var settings = JSON.parse(data);
 } catch (e) {
-	console.log('No', settingsPath.cyan, 'settings file found');
+	console.log('No', settingsPath.cyan, 'settings file found or the file is invalid JSON');
 	process.exit(1);
 }
 
