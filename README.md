@@ -33,3 +33,6 @@ Example uses
 
 	# Download files in the 'Seeding' tag matching 'Foo*'
 	ruget -t seeding Foo*
+
+	# Download files matching 'Foo*' in size order
+	rtget -s size Foo*

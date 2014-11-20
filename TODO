@@ -1,3 +1,5 @@
+* Reverse sort order
 * `upload` torrent files
 * `remove` items
 * `-c` to filter completed items
+* Move items to tag when download completes
