@@ -2,7 +2,26 @@
 	"url": "https://USERNAME:PASSWORD@SERVER.COM/webui/plugins/httprpc/action.php",
 	"sortOrder": ["added", "name"],
 	"commands": {
-		"download": "<dir>/scripts/fetch PASSWORD 'USERNAME@SERVER.COM:\"<path>\"'",
-		"downloadFast": "<dir>/scripts/fetchfast PASSWORD 'USERNAME@SERVER.COM:\"<path>\"'",
+		"download": [
+			"rsync",
+			"-avuc",
+			"--progress",
+			"--append",
+			"--bwlimit=500",
+			"-e",
+			"/usr/bin/sshpass -p PASSWORD /usr/bin/ssh -l USERNAME",
+			"SERVER.COM:\"<path>\"",
+			"."
+		],
+		"downloadFast": [
+			"rsync",
+			"-avuc",
+			"--progress",
+			"--append",
+			"-e",
+			"/usr/bin/sshpass -p PASSWORD /usr/bin/ssh -l USERNAME",
+			"SERVER.COM:\"<path>\"",
+			"."
+		]
 	}
 }

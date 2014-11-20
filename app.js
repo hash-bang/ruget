@@ -1,13 +1,15 @@
 #!/usr/bin/env node
 
 var _ = require('lodash');
+var async = require('async');
 var colors = require('colors');
 var fs = require('fs');
 var humanSize = require('human-size');
 var minimatch = require('minimatch');
 var program = require('commander');
+var spawn = require('child_process').spawn;
+var spawnArgs = require('spawn-args');
 var request = require('superagent');
-var sh = require('execSync');
 var q = require('q');
 var table = require('easy-table');
 
@@ -145,23 +147,45 @@ if (program.list) {
 		});
 // }}}
 } else { // Grab mode
+	var command = program.fast ? settings.commands.downloadFast : settings.commands.download;
+	var args, argBin;
+	if (_.isString(command)) {
+		args = spawnArgs(command);
+		argBin = args.shift();
+	} else {
+		args = command;
+		argBin = args.shift();
+	}
+
 	fetchList(program)
 		.then(function(items) {
-			items.forEach(function(item, index) {
-				console.log('Downloading'.bold, item.name.blue, ('[' + (index+1) + '/' + items.length + ']').cyan);
-				var command = program.fast ? settings.commands.downloadFast : settings.commands.download;
-				command = command
-					.replace('<path>', item.path.replace("'", "\\'"))
-					.replace('<dir>', __dirname);
+			var itemNo = 0;
+			async.eachSeries(items, function(item, nextItem) {
+				itemNo++;
+				console.log('Downloading'.bold, item.name.blue, ('[' + itemNo + '/' + items.length + ']').cyan);
+
+				var myArgs = args.map(function(arg) {
+					return arg
+						.replace('<path>', item.path.replace("'", "\'"))
+						.replace('<dir>', __dirname);
+				});
+
 				if (program.dryrun || program.verbose) {
-					console.log('EXEC'.bold.red, command);
+					console.log('EXEC'.bold.red, argBin, myArgs);
 				}
+
 				if (!program.dryrun) {
-					var code = sh.run(command);
-					if (code != 0) {
-						console.log('Downloader exited with code'.bold.red, code.toString().cyan);
-						process.exit(1);
-					}
+					spawn(argBin, myArgs, {stdio: 'inherit'})
+						.on('close', function(code) {
+							if (code != 0) {
+								console.log('Downloader exited with code'.bold.red, code.toString().cyan);
+								nextItem(code);
+							} else {
+								nextItem();
+							}
+						});
+				} else {
+					nextItem();
 				}
 			});
 		})
