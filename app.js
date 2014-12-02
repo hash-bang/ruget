@@ -152,24 +152,38 @@ function fetchList(options) {
 
 /**
 * Move a given item into a tag
+* @param object program The commander program options object
 * @param object item The item to move
 * @param string tag The new tag the item should have ('none' is a special case to remove the tag)
 */
-function moveItem(item, tag) {
-	request
-		.post(settings.url)
-		.set('Content-Type', 'application/x-www-form-urlencoded')
-		.set('Accept', 'application/json, text/javascript, */*; q=0.01')
-		.send(
-			'mode=setlabel&' +
-			'hash=' + item.hash + '&' +
-			'v=' + (tag == 'none' ? '' : tag) + '&' +
-			's=label'
-		)
-		.end(function(res) {
-			console.log("RES", res);
-		});
+function moveItem(program, item, tag) {
+	if (program.dryrun) {
+		console.log('Would change tag to', tag.cyan);
+	} else {
+		request
+			.post(settings.url)
+			.set('Content-Type', 'application/x-www-form-urlencoded')
+			.set('Accept', 'application/json, text/javascript, */*; q=0.01')
+			.send(
+				'mode=setlabel&' +
+				'hash=' + item.hash + '&' +
+				'v=' + (tag == 'none' ? '' : tag) + '&' +
+				's=label'
+			);
+	}
 }
+
+if (program.args && _.some(program.args, function(item) { // There are command line args specified
+	try {
+		var stats = fs.statSync(item);
+	} catch(e) {
+		return false;
+	}
+	if (program.verbose)
+		console.log('At least one command parameter is a file - switching to upload mode');
+	return stats;
+})) // At least one file is local and on disk - switch to 'upload' mode
+	program.upload = true;
 
 if (program.list) {
  // List mode {{{
@@ -226,7 +240,7 @@ if (program.list) {
 							} else { // Successful download
 								if (program.move) {
 									console.log('Moving to tag'.bold, program.move.cyan);
-									moveItem(item, program.move);
+									moveItem(program, item, program.move);
 								}
 								nextItem();
 							}
