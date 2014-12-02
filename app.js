@@ -20,9 +20,10 @@ program
 	.option('-d, --dryrun', 'Dont actually run any commands, just output what would have run')
 	.option('-l, --list', 'List all files on server (use -t or -c to filter, -s to sort)')
 	.option('-f, --fast', 'Try to download files as quickly as possible')
-	.option('-v, --verbose', 'Be verbose')
-	.option('-t, --tag [tags...]', 'Filter by tag', function(item, value) { value.push(item); return value; }, []) // Coherce into array of tags to filter by
+	.option('-r, --ratio [value]', 'Filter by a minimum ratio')
 	.option('-s, --sort [fields...]', 'Sort by field', function(item, value) { value.push(item); return value; }, [])
+	.option('-t, --tag [tags...]', 'Filter by tag', function(item, value) { value.push(item); return value; }, []) // Coherce into array of tags to filter by
+	.option('-v, --verbose', 'Be verbose')
 	.parse(process.argv);
 
 // Settings {{{
@@ -115,6 +116,12 @@ function fetchList(options) {
 				});
 			}
 
+			if (options.ratio) { // Filter by minimum ratio
+				items = items.filter(function(item) {
+					return item.ratio >= options.ratio;
+				});
+			}
+
 			if (options.tag && options.tag.length > 0) { // Filter by an array of tags
 				var tagSearch = options.tag.map(function(item) { // Remove case from all tags and strip non ASCCI characters
 					return item.toLowerCase().replace(/[^a-z0-9]+/, '');
@@ -145,6 +152,7 @@ if (program.list) {
 			items.forEach(function(item) {
 				t.cell('Name', item.name);
 				t.cell('%', item.complete);
+				t.cell('Ratio', item.ratio);
 				t.cell('Size', humanSize(item.size));
 				t.newRow();
 			});
