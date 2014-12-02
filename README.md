@@ -34,5 +34,11 @@ Example uses
 	# Download files in the 'Seeding' tag matching 'Foo*'
 	ruget -t seeding Foo*
 
+	# Download all completed files
+	ruget -c
+
+	# List all files with a ratio of at least 10
+	ruget -r 10
+
 	# Download files matching 'Foo*' in size order
 	rtget -s size Foo*
