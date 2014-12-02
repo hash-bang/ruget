@@ -92,6 +92,7 @@ function fetchList(options) {
 						name: item[4],
 						size: item[5],
 						complete: Math.round(item[6] / item[7] * 1000) / 10,
+						ratio: item[10] / 1000,
 						tag: item[14],
 						added: new Date(item[21] * 1000),
 						path: item[25],
