@@ -16,8 +16,9 @@ var table = require('easy-table');
 program
 	.version(require('./package.json').version)
 	.usage('[-l] [-t tags...]')
+	.option('-c, --complete', 'Filter by completed files')
 	.option('-d, --dryrun', 'Dont actually run any commands, just output what would have run')
-	.option('-l, --list', 'List all files on server (use -t to filter, -s to sort)')
+	.option('-l, --list', 'List all files on server (use -t or -c to filter, -s to sort)')
 	.option('-f, --fast', 'Try to download files as quickly as possible')
 	.option('-v, --verbose', 'Be verbose')
 	.option('-t, --tag [tags...]', 'Filter by tag', function(item, value) { value.push(item); return value; }, []) // Coherce into array of tags to filter by
@@ -104,6 +105,12 @@ function fetchList(options) {
 							nocase: true,
 						});
 					});
+				});
+			}
+
+			if (options.complete) { // Filter by completed
+				items = items.filter(function(item) {
+					return item.complete >= 100;
 				});
 			}
 
