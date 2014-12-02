@@ -24,6 +24,7 @@ program
 	.option('-r, --ratio [value]', 'Filter by a minimum ratio')
 	.option('-s, --sort [fields...]', 'Sort by field', function(item, value) { value.push(item); return value; }, [])
 	.option('-t, --tag [tags...]', 'Filter by tag', function(item, value) { value.push(item); return value; }, []) // Coherce into array of tags to filter by
+	.option('-u, --upload', 'Upload the specified torrent files')
 	.option('-v, --verbose', 'Be verbose')
 	.parse(process.argv);
 
@@ -202,6 +203,34 @@ if (program.list) {
 		.fail(function() {
 			console.log('No matching items found');
 		});
+// }}}
+} else if (program.upload) {
+// Upload mode {{{
+	var args, argBin;
+	if (_.isString(settings.commands.upload)) {
+		args = spawnArgs(settings.commands.upload);
+		argBin = args.shift();
+	} else {
+		args = settings.commands.upload;
+		argBin = args.shift();
+	}
+
+	var myArgs = args.map(function(arg) {
+		return arg
+			.replace('<paths>', program.args.join(' '))
+			.replace('<dir>', __dirname);
+	});
+
+	if (program.dryrun || program.verbose) {
+		console.log('EXEC'.bold.red, argBin, myArgs);
+	}
+
+	if (!program.dryrun)
+		spawn(argBin, myArgs, {stdio: 'inherit'})
+			.on('close', function(code) {
+				if (code != 0)
+					console.log('Uploader exited with code'.bold.red, code.toString().cyan);
+			});
 // }}}
 } else { // Grab mode
 	var command = program.fast ? settings.commands.downloadFast : settings.commands.download;

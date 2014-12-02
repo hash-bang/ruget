@@ -22,6 +22,16 @@
 			"/usr/bin/sshpass -p PASSWORD /usr/bin/ssh -l USERNAME",
 			"SERVER.COM:\"<path>\"",
 			"."
+		],
+		"upload": [
+			"rsync",
+			"-avuc",
+			"--progress",
+			"--append",
+			"-e",
+			"/usr/bin/sshpass -p PASSWORD /usr/bin/ssh -l USERNAME",
+			"<paths>",
+			"SERVER.COM:~/torrents/watchdir"
 		]
 	}
 }
