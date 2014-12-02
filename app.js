@@ -90,7 +90,7 @@ function fetchList(options) {
 					return {
 						name: item[4],
 						size: item[5],
-						complete: 100, // FIXME: This is wrong
+						complete: Math.round(item[6] / item[7] * 1000) / 10,
 						tag: item[14],
 						added: new Date(item[21] * 1000),
 						path: item[25],
