@@ -2,6 +2,8 @@ ruget
 =====
 Command line tool to interact with a remote [ruTorrent](http://forums.rutorrent.org) server.
 
+**NOTE**: Nearly all API calls used in this program were reverse engineered due to the lack of documentation for ruTorrent. Use of this program assumes you accept these risks.
+
 
 Installation
 ------------
@@ -31,8 +33,8 @@ Example uses
 	# List only files in the 'Seeding' tag matching 'Foo*'
 	ruget -l -t seeding Foo*
 
-	# Download files in the 'Seeding' tag matching 'Foo*'
-	ruget -t seeding Foo*
+	# Download files in the 'Seeding' tag matching 'Foo*' and change the tag to 'Downloaded'
+	ruget -t seeding -m 'Downloaded' Foo*
 
 	# Download all completed files
 	ruget -c

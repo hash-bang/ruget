@@ -20,6 +20,7 @@ program
 	.option('-d, --dryrun', 'Dont actually run any commands, just output what would have run')
 	.option('-l, --list', 'List all files on server (use -t or -c to filter, -s to sort)')
 	.option('-f, --fast', 'Try to download files as quickly as possible')
+	.option('-m, --move [tag]', 'Move an item to the given tag (if fetching this occurs after successful download)')
 	.option('-r, --ratio [value]', 'Filter by a minimum ratio')
 	.option('-s, --sort [fields...]', 'Sort by field', function(item, value) { value.push(item); return value; }, [])
 	.option('-t, --tag [tags...]', 'Filter by tag', function(item, value) { value.push(item); return value; }, []) // Coherce into array of tags to filter by
@@ -84,12 +85,17 @@ function fetchList(options) {
 		)
 		.end(function(res) {
 			var items = _(res.body.t)
+				.map(function(item, hash) {
+					item.push(hash);
+					return item;
+				})
 				.values() // Convert from object -> collection
 				.filter(function(item) { // Scrap invalid items
 					return _.isArray(item) && item.length > 15;
 				})
 				.map(function(item) { // Rewrite array into a logical structure
 					return {
+						hash: item[34],
 						name: item[4],
 						size: item[5],
 						complete: Math.round(item[6] / item[7] * 1000) / 10,
@@ -144,6 +150,27 @@ function fetchList(options) {
 	return defer.promise;
 }
 
+/**
+* Move a given item into a tag
+* @param object item The item to move
+* @param string tag The new tag the item should have ('none' is a special case to remove the tag)
+*/
+function moveItem(item, tag) {
+	request
+		.post(settings.url)
+		.set('Content-Type', 'application/x-www-form-urlencoded')
+		.set('Accept', 'application/json, text/javascript, */*; q=0.01')
+		.send(
+			'mode=setlabel&' +
+			'hash=' + item.hash + '&' +
+			'v=' + (tag == 'none' ? '' : tag) + '&' +
+			's=label'
+		)
+		.end(function(res) {
+			console.log("RES", res);
+		});
+}
+
 if (program.list) {
  // List mode {{{
 	fetchList(program)
@@ -178,7 +205,7 @@ if (program.list) {
 			var itemNo = 0;
 			async.eachSeries(items, function(item, nextItem) {
 				itemNo++;
-				console.log('Downloading'.bold, item.name.blue, ('[' + itemNo + '/' + items.length + ']').cyan);
+				console.log('ruget'.black.bgWhite, 'Downloading'.bold, item.name.blue, ('[' + itemNo + '/' + items.length + ']').cyan);
 
 				var myArgs = args.map(function(arg) {
 					return arg
@@ -196,7 +223,11 @@ if (program.list) {
 							if (code != 0) {
 								console.log('Downloader exited with code'.bold.red, code.toString().cyan);
 								nextItem(code);
-							} else {
+							} else { // Successful download
+								if (program.move) {
+									console.log('Moving to tag'.bold, program.move.cyan);
+									moveItem(item, program.move);
+								}
 								nextItem();
 							}
 						});
