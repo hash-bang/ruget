@@ -156,8 +156,9 @@ function fetchList(options) {
 * @param object program The commander program options object
 * @param object item The item to move
 * @param string tag The new tag the item should have ('none' is a special case to remove the tag)
+* @param function callback(res) The callback to execute on completion
 */
-function moveItem(program, item, tag) {
+function moveItem(program, item, tag, callback) {
 	if (program.dryrun) {
 		console.log('Would change tag to', tag.cyan);
 	} else {
@@ -170,7 +171,11 @@ function moveItem(program, item, tag) {
 				'hash=' + item.hash + '&' +
 				'v=' + (tag == 'none' ? '' : tag) + '&' +
 				's=label'
-			);
+			)
+			.end(function(res) {
+				if (_.isFunction(callback))
+					callback(res);
+			});
 	}
 }
 
@@ -268,10 +273,13 @@ if (program.list) {
 								nextItem(code);
 							} else { // Successful download
 								if (program.move) {
-									console.log('Moving to tag'.bold, program.move.cyan);
-									moveItem(program, item, program.move);
+									console.log('ruget'.black.bgWhite, 'Moving to tag'.bold, program.move.cyan);
+									moveItem(program, item, program.move, function(res) {
+										nextItem();
+									});
+								} else {
+									nextItem();
 								}
-								nextItem();
 							}
 						});
 				} else {
