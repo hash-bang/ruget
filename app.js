@@ -275,14 +275,17 @@ if (program.list) {
 								if (program.move) {
 									console.log('ruget'.black.bgWhite, 'Moving to tag'.bold, program.move.cyan);
 									moveItem(program, item, program.move, function(res) {
+										console.log();
 										nextItem();
 									});
 								} else {
+									console.log();
 									nextItem();
 								}
 							}
 						});
 				} else {
+					console.log();
 					nextItem();
 				}
 			});
