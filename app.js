@@ -33,6 +33,8 @@ program
 if (!process.env || !process.env.HOME) {
 	console.log('Environment variable HOME not found');
 }
+// }}}
+// Load settings {{{
 var settingsPath = process.env.HOME + '/.ruget.json';
 try {
 	var data = fs.readFileSync(settingsPath);
@@ -58,6 +60,16 @@ if (!settings.commands || !settings.commands.downloadFast) {
 // Populate defaults {{{
 if (program.sort.length == 0)
 	program.sort = settings.sortOrder || ['name'];
+// }}}
+// Init settings {{{
+if (settings.acceptAllCerts) {
+	// If enabled we need to force TLS to accept even invalid certs
+	// FIXME: There is no sensible way to do this with Superagent yet as per https://github.com/visionmedia/superagent/issues/188
+	// So the only way we can do this is overriding the TLS env variable
+	// @date 2015-02-10
+	// @author Matt Carter <m@ttcarter.com>
+	process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
+}
 // }}}
 // }}}
 

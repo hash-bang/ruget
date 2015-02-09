@@ -1,6 +1,7 @@
 {
 	"url": "https://USERNAME:PASSWORD@SERVER.COM/webui/plugins/httprpc/action.php",
 	"sortOrder": ["added", "name"],
+	"acceptAllCerts": false,
 	"commands": {
 		"download": [
 			"rsync",
