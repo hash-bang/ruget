@@ -23,7 +23,7 @@ program
 	.option('-m, --move [tag]', 'Move an item to the given tag (if fetching this occurs after successful download)')
 	.option('-r, --ratio [value]', 'Filter by a minimum ratio')
 	.option('-s, --sort [fields...]', 'Sort by field', function(item, value) { value.push(item); return value; }, [])
-	.option('-t, --tag [tags...]', 'Filter by tag', function(item, value) { value.push(item); return value; }, []) // Coherce into array of tags to filter by
+	.option('-t, --tag [tags...]', 'Filter by tag (or "none" for items with no tag)', function(item, value) { value.push(item); return value; }, []) // Coherce into array of tags to filter by
 	.option('-u, --upload', 'Upload the specified torrent files')
 	.option('-v, --verbose', 'Be verbose')
 	.parse(process.argv);
@@ -145,9 +145,15 @@ function fetchList(options) {
 				var tagSearch = options.tag.map(function(item) { // Remove case from all tags and strip non ASCCI characters
 					return item.toLowerCase().replace(/[^a-z0-9]+/, '');
 				});
-				items = items.filter(function(item) {
-					return _.contains(tagSearch, item.tag.toLowerCase().replace(/[^a-z0-9]+/, ''));
-				});
+				if (_.contains(tagSearch, 'none')) { // Special case to search for items without a tag
+					items = items.filter(function(item) {
+						return !item.tag;
+					});
+				} else {
+					items = items.filter(function(item) {
+						return _.contains(tagSearch, item.tag.toLowerCase().replace(/[^a-z0-9]+/, ''));
+					});
+				}
 			}
 
 			if (options.sort && options.sort.length > 0) // Apply sorting
