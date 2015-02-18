@@ -308,10 +308,10 @@ if (program.list) {
 				}
 			});
 		})
-		.catch(function(e) {
-			console.log('Caught', e);
-		})
 		.fail(function() {
 			console.log('No matching items to download');
+		})
+		.catch(function(e) {
+			console.log('Caught', e);
 		});
 }
