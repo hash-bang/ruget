@@ -288,7 +288,7 @@ if (program.list) {
 						.on('close', function(code) {
 							if (code != 0) {
 								console.log('Downloader exited with code'.bold.red, code.toString().cyan);
-								nextItem(code);
+								process.exit(code);
 							} else { // Successful download
 								if (program.move) {
 									console.log('ruget'.black.bgWhite, 'Moving to tag'.bold, program.move.cyan);
