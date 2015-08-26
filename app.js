@@ -111,7 +111,7 @@ function fetchList(options) {
 					return {
 						hash: item[34],
 						name: item[4],
-						size: item[5],
+						size: parseInt(item[5]),
 						complete: Math.round(item[6] / item[7] * 1000) / 10,
 						ratio: item[10] / 1000,
 						tag: item[14],
@@ -158,9 +158,9 @@ function fetchList(options) {
 			}
 
 			if (options.sort && options.sort.length > 0) // Apply sorting
-				items = items.sortBy(options.sort);
+				items = items.sortByAll(options.sort);
 
-			items = items.valueOf(); // Convert into JS array and return
+			items = items.value(); // Convert into JS array and return
 			if (items.length > 0) {
 				defer.resolve(items);
 			} else {

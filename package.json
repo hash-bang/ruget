@@ -1,16 +1,15 @@
 {
   "name": "ruget",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "Command line interface to fetch remote Rutorrent files",
   "main": "app.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "bin": {
     "ruget": "./app.js"
   },
   "keywords": [
-    "rutorrent"
+    "cli",
+    "rutorrent",
+    "torrent"
   ],
   "author": "Matt Carter <m@ttcarter.com>",
   "license": "MIT",
