@@ -96,7 +96,8 @@ function fetchList(options) {
 			'cmd[]=d.get_custom=seedingtime&' +
 			'cmd[]=d.get_custom=addtime'
 		)
-		.end(function(res) {
+		.end(function(err, res) {
+			if (err) return defer.reject(err);
 			var items = _(res.body.t)
 				.map(function(item, hash) {
 					item.push(hash);
