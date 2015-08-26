@@ -1,5 +1,9 @@
 * Reverse sort order
 * `upload` torrent files
+* `upload`ed files should support moving to tags (e.g. `ruget Something.torrent -m Downloads` - or via `-t Downloads`)
 * `remove` items
-* Move items to tag when download completes
+* Filter to download files above or below a certain size (e.g. `-s '>1gb' -s '<2gb'`)
+* Auto assume wrapping globs around terms (e.g. 'ruget foo' -> 'ruget *foo*')
+* Add `move: 'Seed'` to `.ruget.json` options to assume `-m Seed` on successful downloads
+* Add prompt when cancelling a download: `Cancelled. (r)etry, (m)ark as done, (n)ext`
 * Screenshots in doc
