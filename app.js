@@ -20,6 +20,7 @@ program
 	.option('-n, --dryrun', 'Dont actually run any commands, just output what would have run')
 	.option('-l, --list', 'List all files on server (use -t or -c to filter, -s to sort)')
 	.option('-f, --fast', 'Try to download files as quickly as possible')
+	.option('--force', 'Force on errors')
 	.option('-m, --move [tag]', 'Move an item to the given tag (if fetching this occurs after successful download)')
 	.option('-r, --ratio [value]', 'Filter by a minimum ratio')
 	.option('-s, --sort [fields...]', 'Sort by field', function(item, value) { value.push(item); return value; }, [])
@@ -273,6 +274,12 @@ if (program.list) {
 			async.eachSeries(items, function(item, nextItem) {
 				itemNo++;
 				console.log('ruget'.black.bgWhite, 'Downloading'.bold, item.name.blue, ('[' + itemNo + '/' + items.length + ']').cyan);
+
+				if (!item.path && !program.force) {
+					console.log('Error'.red, 'Refusing to download item with a null path. Use --force if you really want this.');
+					console.log('Item data', colors.cyan(item));
+					return nextItem();
+				}
 
 				var myArgs = args.map(function(arg) {
 					return arg
