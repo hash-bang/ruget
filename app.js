@@ -24,6 +24,7 @@ program
 	.option('-m, --move [tag]', 'Move an item to the given tag (if fetching this occurs after successful download)')
 	.option('-r, --ratio [value]', 'Filter by a minimum ratio')
 	.option('-s, --sort [fields...]', 'Sort by field', function(item, value) { value.push(item); return value; }, [])
+	.option('-S, --sort-reverse', 'Reverse the sorted items')
 	.option('-t, --tag [tags...]', 'Filter by tag (or "none" for items with no tag)', function(item, value) { value.push(item); return value; }, []) // Coherce into array of tags to filter by
 	.option('-u, --upload', 'Upload the specified torrent files')
 	.option('-v, --verbose', 'Be verbose')
@@ -162,6 +163,8 @@ function fetchList(options) {
 				items = items.sortBy(options.sort);
 
 			items = items.value(); // Convert into JS array and return
+			if (options.sortReverse) items.reverse();
+
 			if (items.length > 0) {
 				defer.resolve(items);
 			} else {
