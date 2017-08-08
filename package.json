@@ -14,15 +14,15 @@
   "author": "Matt Carter <m@ttcarter.com>",
   "license": "MIT",
   "dependencies": {
-    "superagent": "~1.3.0",
-    "commander": "~2.8.1",
-    "lodash": "~3.10.1",
-    "easy-table": "~1.0.0",
-    "human-size": "~1.1.0",
+    "async": "~2.5.0",
     "colors": "~1.1.2",
-    "minimatch": "~2.0.10",
-    "q": "~1.4.1",
-    "async": "~1.4.2",
-    "spawn-args": "0.1.0"
+    "commander": "~2.11.0",
+    "easy-table": "~1.1.0",
+    "human-size": "~1.1.0",
+    "lodash": "^4.17.4",
+    "minimatch": "~3.0.4",
+    "q": "~1.5.0",
+    "spawn-args": "0.2.0",
+    "superagent": "~3.5.2"
   }
 }
