@@ -147,19 +147,19 @@ function fetchList(options) {
 				var tagSearch = options.tag.map(function(item) { // Remove case from all tags and strip non ASCCI characters
 					return item.toLowerCase().replace(/[^a-z0-9]+/, '');
 				});
-				if (_.contains(tagSearch, 'none')) { // Special case to search for items without a tag
+				if (_.includes(tagSearch, 'none')) { // Special case to search for items without a tag
 					items = items.filter(function(item) {
 						return !item.tag;
 					});
 				} else {
 					items = items.filter(function(item) {
-						return _.contains(tagSearch, item.tag.toLowerCase().replace(/[^a-z0-9]+/, ''));
+						return _.includes(tagSearch, item.tag.toLowerCase().replace(/[^a-z0-9]+/, ''));
 					});
 				}
 			}
 
 			if (options.sort && options.sort.length > 0) // Apply sorting
-				items = items.sortByAll(options.sort);
+				items = items.sortBy(options.sort);
 
 			items = items.value(); // Convert into JS array and return
 			if (items.length > 0) {
@@ -193,8 +193,7 @@ function moveItem(program, item, tag, callback) {
 				's=label'
 			)
 			.end(function(res) {
-				if (_.isFunction(callback))
-					callback(res);
+				if (_.isFunction(callback)) callback(res);
 			});
 	}
 }
