@@ -1,6 +1,6 @@
 {
   "name": "ruget",
-  "version": "0.2.9",
+  "version": "1.0.0",
   "description": "Command line interface to fetch remote Rutorrent files",
   "main": "app.js",
   "bin": {
